@@ -3,18 +3,27 @@ package com.example.wkw.myapplication;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wkw.myapplication.bean.NewsBean;
 import com.thinkland.sdk.android.DataCallBack;
 import com.thinkland.sdk.android.JuheData;
 import com.thinkland.sdk.android.Parameters;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private Context mContext;
     TextView tv;
-
+    private List<NewsBean> newsBeanList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mContext = this;
         tv = (TextView) findViewById(R.id.tv);
-
+        newsBeanList = new ArrayList<>();
         /**
          * 请不要添加key参数.
          */
@@ -46,7 +55,41 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(int statusCode, String responseString) {
                         // TODO Auto-generated method stub
-                        tv.append(responseString + "\n");
+                        try {
+                            String name = "result";
+                            JSONObject jsonObject =new JSONObject(responseString);
+                            String result = jsonObject.getString(name);
+                            jsonObject = new JSONObject(result);
+//                            result = jsonObject.getString("data");
+                            JSONArray jsonArray = jsonObject.getJSONArray("data");
+//                            private String title;
+//                            private String date;
+//                            private String category;
+//                            private String authot_name;
+//                            private String thumbnail_pic_s;
+//                            private String url;
+//                            private String thumbnail_pic_s03;
+                            for (int i = 0; i < jsonArray.length(); i ++){
+                                JSONObject object = jsonArray.getJSONObject(i);
+//                                Log.i("mains","Object" + i  + "");
+                                NewsBean newsBean = new NewsBean();
+                                Log.i("mains","Object" + object.toString()  + "");
+                                newsBean.setTitle(object.getString("title"));
+                                newsBean.setDate(object.getString("date"));
+                                newsBean.setCategory(object.getString("category"));
+                                newsBean.setAuthor_name(object.getString("author_name"));
+                                newsBean.setThumbnail_pic_s(object.getString("thumbnail_pic_s"));
+                                newsBean.setUrl(object.getString("url"));
+                                newsBean.setThumbnail_pic_s03(object.getString("thumbnail_pic_s03"));
+                                newsBeanList.add(newsBean);
+                                Log.i("mains",i  + "");
+                            }
+                            Log.i("mains","jsonArray.length()" + jsonArray.length()  + "");
+                            tv.append(newsBeanList.size() + "");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                     }
 
                     /**
